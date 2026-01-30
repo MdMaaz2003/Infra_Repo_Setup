@@ -5,16 +5,11 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                cleanWs()   // 🔥 VERY IMPORTANT
+                cleanWs()   
                 checkout scm
             }
         }
 
-        /* =========================
-           CI PIPELINE (PULL REQUEST)
-           - No backend
-           - No state
-        ========================= */
 
         stage('Terraform Init (CI)') {
             when {
@@ -42,12 +37,6 @@ pipeline {
                 bat 'terraform validate'
             }
         }
-
-        /* =========================
-           CD PIPELINE (MAIN BRANCH)
-           - Uses S3 backend
-           - Non-interactive
-        ========================= */
 
         stage('Terraform Init (CD)') {
             when {
