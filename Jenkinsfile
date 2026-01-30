@@ -49,7 +49,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                withCredentials([[
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
@@ -63,14 +63,13 @@ pipeline {
                 branch 'main'
             }
             steps {
-                withCredentials([[
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
                     bat '''
                     terraform plan ^
-                      -var="ami_id=ami-0abcdef12345" ^
-                      -var="key_name=my-key" ^
+                      -var="key_name=react-ec2-key" ^
                       -out=tfplan
                     '''
                 }
@@ -83,7 +82,7 @@ pipeline {
             }
             steps {
                 input message: "Deploy infrastructure to AWS?"
-                withCredentials([[
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
@@ -93,3 +92,4 @@ pipeline {
         }
     }
 }
+
