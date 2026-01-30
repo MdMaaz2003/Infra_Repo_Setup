@@ -10,7 +10,7 @@ pipeline {
         }
 
         /* =========================
-           CI PIPELINE (PR)
+           CI PIPELINE (PULL REQUEST)
         ========================= */
 
         stage('Terraform Init (CI)') {
@@ -41,7 +41,7 @@ pipeline {
         }
 
         /* =========================
-           CD PIPELINE (MAIN)
+           CD PIPELINE (MAIN BRANCH)
         ========================= */
 
         stage('Terraform Init (CD)') {
@@ -49,7 +49,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                withCredentials([[ 
+                withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
@@ -63,13 +63,13 @@ pipeline {
                 branch 'main'
             }
             steps {
-                withCredentials([[ 
+                withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
                     bat '''
                     terraform plan ^
-                      -var="key_name=react-ec2-key" ^
+                      -var="instance_count=2" ^
                       -out=tfplan
                     '''
                 }
@@ -82,7 +82,7 @@ pipeline {
             }
             steps {
                 input message: "Deploy infrastructure to AWS?"
-                withCredentials([[ 
+                withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
@@ -92,4 +92,5 @@ pipeline {
         }
     }
 }
+
 

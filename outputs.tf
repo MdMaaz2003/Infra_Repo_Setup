@@ -1,7 +1,6 @@
-# output "instance_id" {
-#   value = aws_instance.demo.id
-# }
+output "ec2_public_ips" {
+  description = "Public IPs of EC2 instances"
+  value       = aws_instance.react_ec2[*].public_ip
+}
 
-# output "public_ip" {
-#   value = aws_instance.demo.public_ip
-# }
+

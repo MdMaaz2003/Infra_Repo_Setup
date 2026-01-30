@@ -4,7 +4,15 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-variable "key_name" {
-  description = "EC2 Key Pair name"
-  type        = string
+variable "instance_count" {
+  description = "Number of EC2 instances"
+  type        = number
+  default     = 1
 }
+
+variable "key_name" {
+  description = "EC2 key pair name"
+  type        = string
+  default     = "react-ec2-key"
+}
+
