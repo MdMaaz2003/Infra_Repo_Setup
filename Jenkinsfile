@@ -1,49 +1,95 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "react-frontend"
-        CONTAINER_NAME = "react-frontend-container"
-    }
-
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        /* =========================
+           CI PIPELINE (PR)
+        ========================= */
+
+        stage('Terraform Init (CI)') {
+            when {
+                changeRequest()
+            }
             steps {
-                bat """
-                docker build -t %IMAGE_NAME% .
-                """
+                bat 'terraform init -backend=false'
             }
         }
 
-        stage('Stop Old Container (if exists)') {
+        stage('Terraform Format Check (CI)') {
+            when {
+                changeRequest()
+            }
             steps {
-                bat """
-                docker stop %CONTAINER_NAME% || exit 0
-                docker rm %CONTAINER_NAME% || exit 0
-                """
+                bat 'terraform fmt -check -recursive'
             }
         }
 
-        stage('Run Container') {
+        stage('Terraform Validate (CI)') {
+            when {
+                changeRequest()
+            }
             steps {
-                bat """
-                docker run -d -p 3000:80 --name %CONTAINER_NAME% %IMAGE_NAME%
-                """
+                bat 'terraform validate'
             }
         }
-    }
 
-    post {
-        success {
-            echo "React app deployed successfully!"
+        /* =========================
+           CD PIPELINE (MAIN)
+        ========================= */
+
+        stage('Terraform Init (CD)') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    bat 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Plan (CD)') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    bat '''
+                    terraform plan ^
+                      -var="ami_id=ami-0abcdef12345" ^
+                      -var="key_name=my-key" ^
+                      -out=tfplan
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Apply (CD)') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: "Deploy infrastructure to AWS?"
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    bat 'terraform apply tfplan'
+                }
+            }
         }
     }
 }
-
