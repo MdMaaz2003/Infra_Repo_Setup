@@ -58,7 +58,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat 'terraform init -reconfigure -input=false'
+                    bat 'terraform init -reconfigure -migrate-state=false -input=false'
                 }
             }
         }
