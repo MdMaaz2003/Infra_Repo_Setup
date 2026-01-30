@@ -5,6 +5,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                cleanWs()   // 🔥 VERY IMPORTANT
                 checkout scm
             }
         }
@@ -96,4 +97,3 @@ pipeline {
         }
     }
 }
-
