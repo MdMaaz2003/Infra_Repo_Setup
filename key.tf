@@ -3,3 +3,6 @@ resource "aws_key_pair" "react_key" {
   public_key = file("${path.module}/react-ec2-key.pub")
 }
 
+# testing ci pipeline
+
+
