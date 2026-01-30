@@ -11,6 +11,9 @@ pipeline {
 
         /* =========================
            CI PIPELINE (PULL REQUEST)
+           - No backend
+           - No state
+           - No prompts
         ========================= */
 
         stage('Terraform Init (CI)') {
@@ -18,7 +21,7 @@ pipeline {
                 changeRequest()
             }
             steps {
-                bat 'terraform init -backend=false'
+                bat 'terraform init -backend=false -input=false'
             }
         }
 
@@ -42,6 +45,8 @@ pipeline {
 
         /* =========================
            CD PIPELINE (MAIN BRANCH)
+           - Uses S3 backend
+           - Non-interactive
         ========================= */
 
         stage('Terraform Init (CD)') {
@@ -53,7 +58,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat 'terraform init'
+                    bat 'terraform init -reconfigure -input=false'
                 }
             }
         }
@@ -86,11 +91,10 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat 'terraform apply tfplan'
+                    bat 'terraform apply -input=false tfplan'
                 }
             }
         }
     }
 }
-
 
