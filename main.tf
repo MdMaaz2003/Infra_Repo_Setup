@@ -8,3 +8,4 @@ resource "aws_instance" "react_ec2" {
     Name = "react-app-server"
   }
 }
+
