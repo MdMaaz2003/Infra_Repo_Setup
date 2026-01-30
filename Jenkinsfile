@@ -13,7 +13,6 @@ pipeline {
            CI PIPELINE (PULL REQUEST)
            - No backend
            - No state
-           - No prompts
         ========================= */
 
         stage('Terraform Init (CI)') {
@@ -58,7 +57,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat 'terraform init -reconfigure -migrate-state=false -input=false'
+                    bat 'terraform init -reconfigure -input=false'
                 }
             }
         }
